@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Dress Up Game UI</title>
+<link rel="stylesheet" href="./css/style.css" type="text/css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+  #coin {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    padding: 6px 40px;
+    background-color: #d480b1;
+    border-radius: 8px;
+  }
+  #coin h4 {
+    cursor: pointer;
+    color: white;
+  }
+  .palette-header {
+    background-color: #ffc7e8;
+  }
+  #paletteContent {
+    background-color: #ffeef8;
+  }
+  #paletteClose {
+    background-color: #d480b1;
+  }
+</style>
+</head>
+<body>
+<div id="notification-container"></div>
+<div id="coin"><h4 id="saveButton">保存</h4></div>
+
+<canvas id="mainCanvas" width="1500" height="1500" style="width:512px; height:512px;"></canvas>
+
+<div class="tab-bar" id="tab-bar">
+    <div class="tab-buttons"></div>
+</div>
+<!-- bodyの末尾に追加 -->
+<div id="colorPalette" class="palette">
+  <div class="palette-header">
+    <span id="paletteTitle">カラーパレット</span>
+    <button id="paletteClose">✕</button>
+  </div>
+  <div id="paletteContent" class="palette-content">
+    <p>このアイテムは色変え非対応です。</p>
+  </div>
+</div>
+
+<script>
+function notification(message, color = "#333", imagePath = null, duration = 3000, icon_name=null) {
+  const container = document.getElementById("notification-container");
+  const textColor = getTextColor(color);
+
+  const note = document.createElement("div");
+  note.className = "notification";
+  note.style.backgroundColor = color;
+  note.style.color = textColor;
+
+  // 左側アイコン
+  if (imagePath && icon_name == null) {
+    const img = document.createElement("img");
+    img.src = imagePath;
+    note.appendChild(img);
+  } else if (icon_name != null) {
+    const i = document.createElement("i");
+    i.classList = "material-icons";
+    i.textContent = icon_name;
+    note.appendChild(i);
+  } else {
+    const img = document.createElement("img");
+    note.appendChild(img);
+  }
+
+  // メッセージ
+  const text = document.createElement("span");
+  text.textContent = message;
+  note.appendChild(text);
+
+  // 閉じるボタン
+  const closeBtn = document.createElement("button");
+  closeBtn.innerHTML = "×";
+  closeBtn.onclick = () => removeNote(note);
+  note.appendChild(closeBtn);
+
+  container.appendChild(note);
+
+  // 出現
+  setTimeout(() => note.classList.add("show"), 10);
+
+  // 自動消去
+  if (duration > 0) {
+    setTimeout(() => removeNote(note), duration);
+  }
+}
+function removeNote(note) {
+  note.classList.remove("show");
+  note.style.margin = "0"; // ← 上に滑らかに詰める用
+  setTimeout(() => note.remove(), 300);
+}
+
+// 背景色に合わせた文字色
+function getTextColor(bgColor) {
+  const c = bgColor.replace("#", "");
+  const r = parseInt(c.substring(0, 2), 16);
+  const g = parseInt(c.substring(2, 4), 16);
+  const b = parseInt(c.substring(4, 6), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness < 140 ? "#ffffff" : "#000000";
+}
+// 背景色に合わせた文字色
+function getImageColor(white,black,bgColor) {
+  const c = bgColor.replace("#", "");
+  const r = parseInt(c.substring(0, 2), 16);
+  const g = parseInt(c.substring(2, 4), 16);
+  const b = parseInt(c.substring(4, 6), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness < 140 ? white : black;
+}
+
+// ✅ プリセット通知
+notification.success = (msg, duration = 3000) =>
+  notification(msg, "#61e75aff", null, duration, "done"); // 緑
+notification.error = (msg, duration = 10000) =>
+  notification(msg, "#E53935", null, duration, "error"); // 赤
+notification.warning = (msg, duration = 3000) =>
+  notification(msg, "#fff700ff", null, duration, "warning"); // オレンジ
+notification.help = (msg, duration = 3000) =>
+  notification(msg, "#00b7ff", null, duration, "help"); // オレンジ
+notification.info = (msg, duration = 3000) =>
+  notification(msg, "#005eff", null, duration, "info"); // オレンジ
+if (location.protocol == "file:") {
+  document.getElementById("mainCanvas").remove();
+  document.getElementById("tab-bar").remove();
+  notification.error("index.htmlを直接開かないでください")
+  const h1 = document.createElement("h1");
+  h1.textContent = "起動方法が間違っています";
+  const valign_wrapper = document.createElement("div");
+  valign_wrapper.classList = "card-panel pink lighten-2 z-depth-4"
+  valign_wrapper.style = "width: 95%; border-radius: 10px;"
+  const p = document.createElement("h6");
+  p.textContent = "起動方法";
+  p.classList ="white-text left-align";
+  const body = document.querySelector("body");
+  body.appendChild(h1);
+  valign_wrapper.appendChild(p);
+  body.appendChild(valign_wrapper);
+}
+</script>
+<script type="module" src="./js/main.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+</body>
+</html>
